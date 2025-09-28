@@ -1,5 +1,5 @@
-// import { CreateAssistantDTO } from "@vapi-ai/web/dist/api";
-// import { z } from "zod";
+import { CreateAssistantDTO } from "@vapi-ai/web/dist/api";
+import { z } from "zod";
 //
 import {CreateAssistantDTO} from "@vapi-ai/web/api";
 
