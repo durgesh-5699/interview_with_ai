@@ -118,9 +118,8 @@ const Agent = ({
     setCallStatus(CallStatus.CONNECTING);
 
     if (type === "generate") {
-        console.log("Workflow ID:", process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID);
-        console.log("Starting workflow with:", { userName, userId });
-      await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
+      await vapi.start(
+        process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!,{
         variableValues: {
           username: userName,
           userid: userId,
