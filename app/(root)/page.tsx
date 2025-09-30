@@ -18,6 +18,8 @@ const Page = async ()=>{
     const hasPastInterviews = userInterviews?.length > 0 ;
     const hasUpcomingInterviews = latestInterviews?.length > 0 ;
 
+    console.log("to check error -> ", userInterviews,latestInterviews) ;    
+
     return (
         <>
             <section className="card-cta">
@@ -51,7 +53,7 @@ const Page = async ()=>{
                     {
                         hasUpcomingInterviews ? (
                             latestInterviews?.map((interview)=>(
-                                <InterviewCard {...interview} key={interview.id} />
+                                <InterviewCard {...interview} interviewId={interview.id} key={interview.id} />
                             ))
                         ) : (<p>There are no new interviews available</p>)
                     }

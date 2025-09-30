@@ -9,17 +9,15 @@ import { redirect } from "next/navigation";
 const page = async ({params} : RouteParams) => {
 
     const {id} = await params ;
-    const user = getCurrentUser() ;
+    const user = await getCurrentUser() ;
 
     const interview = await getInterviewsById(id) ;
-    if(!interview) redirect('/') ;
+    if(!interview) redirect("/") ;
 
     const feedback = await getFeedbackByInterviewId({
         interviewId : id ,
         userId : user?.id! ,
     })
-
-    console.log(feedback) ;
 
   return (
     <section className="section-feedback">
@@ -44,7 +42,7 @@ const page = async ({params} : RouteParams) => {
                 </div>
 
                 <div className="flex flex-row gap-2">
-                    <Image src="/calender.svg" width={22} height={22} alt="calender"/>
+                    <Image src="/calendar.svg" width={22} height={22} alt="calender"/>
                     <p>
                     {feedback?.createdAt 
                         ?dayjs(feedback.createdAt).format("MMM D, YYYY h:mm A")

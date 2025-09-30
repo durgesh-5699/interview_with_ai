@@ -7,6 +7,7 @@ import { generateObject } from "ai";
 import { create } from "domain";
 
 export async function getInterviewsByUserId(userId : string) : Promise<Interview[] | null>{
+    
     const interviews = await db
         .collection('interviews')
         .where('userId' , '==' , userId)
@@ -24,10 +25,9 @@ export async function getLatestInterviews(params : GetLatestInterviewsParams) : 
 
     const interviews = await db
         .collection('interviews')
-        .where('userId' , '==' , userId)
-        .orderBy('createdAt' , 'desc')
+        .where('userId' , '!=' , userId)
         .where('finalized','==',true)
-        .where('userId','!=',userId)
+        .orderBy('createdAt' , 'desc')
         .limit(limit)
         .get() ;
         
@@ -47,15 +47,15 @@ export async function getInterviewsById(id : string) : Promise<Interview | null>
 }
 
 export async function createFeedback(params : CreateFeedbackParams){
-    const {interviewId,userId,transcript} = params ;
-    console.log("params : ->",params) ;
+    const {interviewId,userId,transcript,feedbackId} = params ;
+
     try{
         const formattedTranscript = transcript
         .map((sentence : {role:string , content :string})=>{
                 `-${sentence.role} : ${sentence.content}\n`
             }).join('');
 
-        const {object : totalScore, categoryScores, strengths, areasForImprovement, finalAssessment } = await generateObject({
+        const {object} = await generateObject({
             model : google('gemini-2.0-flash-001',{
                 structuredOutputs : false ,
             }),
@@ -79,31 +79,36 @@ export async function createFeedback(params : CreateFeedbackParams){
         const feedback = await db.collection('feedbacks').add({
             interviewId,
             userId,
-            totalScore,
-            categoryScores,
-            strengths,
-            areasForImprovement,
-            finalAssessment,
+            totalScore : object.totalScore,
+            categoryScores : object.categoryScores,
+            strengths : object.strengths,
+            areasForImprovement : object.areasForImprovement,
+            finalAssessment : object.finalAssessment,       
             createdAt : new Date().toISOString(),
         })
 
-        return {
-            success :true ,
-            feedbackId : feedback.id 
+        let feedbackRef;
+
+        if (feedbackId) {
+            feedbackRef = db.collection("feedback").doc(feedbackId);
+        } else {
+            feedbackRef = db.collection("feedback").doc();
         }
+
+        return {success :true , feedbackId : feedback.id }
     }catch(e){
-        console.error(e) ;
+        console.error("error saving feedback : ",e) ;
         return {success : false} ;
     }
 }
 
-export async function getFeedbackByInterviewId(params : GetLatestInterviewsParams):Promise<Feedback | null>{
-    const {intreviewId , userId} = params ;
+export async function getFeedbackByInterviewId(params : GetFeedbackByInterviewIdParams):Promise<Feedback | null>{
+    const {interviewId , userId} = params ;
 
+    console.log("interviewId , userId -> ",interviewId , userId) ;
     const feedback = await db
     .collection('feedbacks')
-    .where('inetrviewId','==',intreviewId)
-    .where('userId','==',userId)
+    .where('interviewId','==',interviewId)
     .limit(1)
     .get() ;
 
