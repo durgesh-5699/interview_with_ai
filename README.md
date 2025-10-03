@@ -24,7 +24,7 @@ A full-stack web application that leverages AI to provide a realistic and custom
 * **AI Engine**: Google Gemini
 * **Voice AI**: Vapi
 * **Deployment**: Vercel
-* 
+
 ---
 ## 🚀 Installation
 
